@@ -5,13 +5,10 @@ import 'ds-test/test.sol';
 
 contract YulTestContract is DSTest {
 
-	// These state vars just push map into slot 3
-	uint256 public num0 = 12;
+	// This state vars just push map into slot 2 for fun
 	uint256 public num = 42;
-
 	// map 
 	mapping(uint256 => address) public map;
-
 	function testYulMapping() public {
 		map[0] = address(0xb33f);
 		map[10] = address(0xf33d);
@@ -21,16 +18,16 @@ contract YulTestContract is DSTest {
 		address addrAt10;
 		address addrAt7;
 		assembly {
-			// store the maps slot in scratch space @2nd word pos. We'll reuse this for each lookup
+		// store the maps slot in scratch space @2nd word pos. We'll reuse this for each lookup
 			mstore(0x20, map.slot)
-			// store the 0 key in the first word of scratch space
+		// store the 0 key in the first word of scratch space
 			mstore(0x0, 0x0)
-			// the value at key 0 is stored at sha3(0 . map.slot)
+		// the value at key 0 is stored at sha3(0 . map.slot)
 			addrAt0 := sload(keccak256(0, 0x40))
-			// the value at key 10 is stored at sha3(10 . map.slot)
+		// the value at key 10 is stored at sha3(10 . map.slot)
 			mstore(0x0, 0xa)
 			addrAt10 := sload(keccak256(0, 0x40))
-			// the value at key 7 is stored at sha3(7 . map.slot)
+		// the value at key 7 is stored at sha3(7 . map.slot)
 			mstore(0x0, 0x7)
 			addrAt7 := sload(keccak256(0, 0x40))
 		}
@@ -39,7 +36,8 @@ contract YulTestContract is DSTest {
 		emit log_address(addrAt0);
 		/*
 		Logs:
-  			0x00000000 00000000 00000000 00000000 0000f57d
+  			0x000000000000000000000000000000000000dead
+  			0x000000000000000000000000000000000000f33d
   			0x000000000000000000000000000000000000b33f
 		*/
 	}
